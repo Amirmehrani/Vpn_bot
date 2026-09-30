@@ -62,7 +62,7 @@ PLANS = {
 # دیتابیس
 # =========================================================
 
-DB_FILE = "vpn_bot.db"
+DB_FILE =DB_FILE = "/tmp/vpn_bot.db"
 
 
 def db():
