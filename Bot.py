@@ -163,6 +163,7 @@ def main_menu():
         [
             [InlineKeyboardButton("🛒 خرید VPN", callback_data="buy")],
             [InlineKeyboardButton("🆘 پشتیبانی", callback_data="support")],
+            [InlineKeyboardButton("🔙 بازگشت", callback_data="back_main")],
         ]
     )
 
