@@ -402,6 +402,28 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+
+    # Admin reply with photo -> send photo + caption to customer
+    if ADMIN_ID and user and user.id == ADMIN_ID and update.message.reply_to_message:
+        target_user_id = find_support_user(
+            update.message.reply_to_message.message_id
+        )
+
+        if target_user_id:
+            caption = update.message.caption or ""
+
+            await context.bot.send_photo(
+                chat_id=target_user_id,
+                photo=update.message.photo[-1].file_id,
+                caption=caption,
+            )
+
+            await update.message.reply_text(
+                "✅ عکس و متن برای مشتری ارسال شد."
+            )
+            return
+
     state = context.user_data.get("state")
 
     if state == "waiting_receipt":
@@ -426,20 +448,29 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     f"👤 کاربر: {user.full_name}\n"
                     f"🆔 ID: {user.id}\n"
                     f"🔗 @{user.username if user.username else 'ندارد'}\n"
-                    f"📝 توضیح: {caption or 'ندارد'}"
+                    f"📝 توضیح: {caption or 'ندارد'}\n\n"
+                    "↩️ برای ارسال پاسخ، روی همین عکس Reply کنید."
                 ),
             )
-            # Replying to the receipt from the admin is not used for customer
-            # replies; order verification remains manual.
+
+            save_support_mapping(
+                user.id,
+                admin_msg.message_id,
+                update.message.message_id,
+            )
+
         await update.message.reply_text(
             "✅ رسید شما دریافت شد.\n\n"
             "⏳ پس از بررسی پرداخت، سرویس شما تأیید می‌شود و "
             "کانفیگ توسط پشتیبانی برایتان ارسال خواهد شد."
         )
+
         context.user_data["state"] = "done"
         return
 
-    await update.message.reply_text("لطفاً ابتدا یک سفارش ثبت کنید.")
+    await update.message.reply_text(
+        "لطفاً ابتدا یک سفارش ثبت کنید."
+    )
 
 web_app = Flask(__name__)
 
