@@ -3,6 +3,9 @@ import re
 import sqlite3
 from pathlib import Path
 from datetime import datetime, timezone
+
+from flask import Flask
+
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
@@ -431,7 +434,15 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text("لطفاً ابتدا یک سفارش ثبت کنید.")
 
+web_app = Flask(__name__)
 
+@web_app.route("/")
+def health():
+    return "Bot is running", 200
+
+def run_web():
+    port = int(os.getenv("PORT", "8080"))
+    web_app.run(host="0.0.0.0", port=port)
 def main():
     init_db()
     app = Application.builder().token(BOT_TOKEN).build()
@@ -449,5 +460,6 @@ def main():
     )
 
 
-if __name__ == "__main__":
+    if __name__ == "__main__":
+    threading.Thread(target=run_web, daemon=True).start()
     main()
