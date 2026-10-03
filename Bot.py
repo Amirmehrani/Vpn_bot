@@ -460,6 +460,6 @@ def main():
     )
 
 
-    if __name__ == "__main__":
-        threading.Thread(target=run_web, daemon=True).start()
-        main()
+if __name__ == "__main__":
+    threading.Thread(target=run_web, daemon=True).start()
+    main()
