@@ -166,7 +166,12 @@ def main_menu():
             [InlineKeyboardButton("🔙 بازگشت", callback_data="back_main")],
         ]
     )
-
+def back_keyboard():
+    return ReplyKeyboardMarkup(
+        [[KeyboardButton("🔙 بازگشت")]],
+        resize_keyboard=True,
+        one_time_keyboard=False,
+    )
 
 def duration_menu():
     return InlineKeyboardMarkup(
