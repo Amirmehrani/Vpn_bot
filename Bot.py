@@ -430,7 +430,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await update.message.reply_text(
             "🏠 به منوی اصلی برگشتید.",
-            reply_markup=main_menu(),
+            reply_markup=back_keyboard(),
         )
         return
     # Admin reply with photo -> send photo + caption to customer
