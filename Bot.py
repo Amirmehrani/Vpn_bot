@@ -226,27 +226,30 @@ async def myid(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"🆔 شناسه عددی شما:\n\n{update.effective_user.id}"
     )
 
-
 async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     data = query.data
-if data == "buy":
-    context.user_data.clear()
-    await query.edit_message_text(
-        "🛒 خرید VPN\n\nمدت سرویس را انتخاب کنید:",
-        reply_markup=duration_menu(),
-    )
 
-    await context.bot.send_message(
-        chat_id=update.effective_user.id,
-        text="برای برگشت به منوی اصلی:",
-        reply_markup=back_keyboard(),
-    )
-    return
+    if data == "buy":
+        context.user_data.clear()
+
+        await query.edit_message_text(
+            "🛒 خرید VPN\n\nمدت سرویس را انتخاب کنید:",
+            reply_markup=duration_menu(),
+        )
+
+        await context.bot.send_message(
+            chat_id=update.effective_user.id,
+            text="برای برگشت به منوی اصلی:",
+            reply_markup=back_keyboard(),
+        )
+        return
+
     if data.startswith("duration_"):
         duration = data.replace("duration_", "")
         context.user_data["duration"] = duration
+
         await query.edit_message_text(
             f"{PLANS[duration]['title']}\n\nحجم سرویس را انتخاب کنید:",
             reply_markup=volume_menu(duration),
@@ -256,6 +259,7 @@ if data == "buy":
     if data.startswith("volume_"):
         _, duration, volume_key = data.split("_")
         item = PLANS[duration]["items"][volume_key]
+
         context.user_data.update(
             {
                 "duration": duration,
@@ -264,6 +268,7 @@ if data == "buy":
                 "state": "waiting_vpn_username",
             }
         )
+
         await query.edit_message_text(
             f"📦 حجم انتخابی: {item['volume']}\n"
             f"💰 مبلغ: {item['price']:,} تومان\n\n"
@@ -276,6 +281,7 @@ if data == "buy":
 
     if data == "confirm_order":
         required = ("duration", "volume", "price", "vpn_username")
+
         if any(key not in context.user_data for key in required):
             await query.edit_message_text(
                 "❌ اطلاعات سفارش ناقص است. لطفاً دوباره از خرید VPN شروع کنید.",
@@ -297,6 +303,7 @@ if data == "buy":
             volume,
             price,
         )
+
         context.user_data.update(
             {"order_id": order_id, "state": "waiting_receipt"}
         )
@@ -318,6 +325,7 @@ if data == "buy":
 
     if data == "support":
         context.user_data["state"] = "support"
+
         await query.edit_message_text(
             "🆘 پشتیبانی\n\n"
             "📝 مشکل یا درخواست خود را بنویسید.\n"
@@ -327,11 +335,11 @@ if data == "buy":
 
     if data == "back_main":
         context.user_data.clear()
+
         await query.edit_message_text(
-            "🏠 منوی اصلی", reply_markup=main_menu()
+            "🏠 منوی اصلی",
+            reply_markup=main_menu(),
         )
-
-
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     text = update.message.text.strip()
