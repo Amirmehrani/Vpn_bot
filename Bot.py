@@ -332,7 +332,16 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     text = update.message.text.strip()
+    text = update.message.text
 
+    if text == "🔙 بازگشت":
+        context.user_data.clear()
+
+        await update.message.reply_text(
+            "🏠 به منوی اصلی برگشتید.",
+            reply_markup=main_menu(),
+        )
+        return
     # Admin reply routing: reply directly to a support message in the admin chat.
     if ADMIN_ID and user and user.id == ADMIN_ID and update.message.reply_to_message:
         target_user_id = find_support_user(update.message.reply_to_message.message_id)
