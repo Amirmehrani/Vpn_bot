@@ -234,12 +234,18 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = query.data
 
     if data == "buy":
-        context.user_data.clear()
-        await query.edit_message_text(
-            "🛒 خرید VPN\n\nمدت سرویس را انتخاب کنید:",
-            reply_markup=duration_menu(),
-        )
-        return
+    context.user_data.clear()
+    await query.edit_message_text(
+        "🛒 خرید VPN\n\nمدت سرویس را انتخاب کنید:",
+        reply_markup=duration_menu(),
+    )
+
+    await context.bot.send_message(
+        chat_id=update.effective_user.id,
+        text="برای برگشت به منوی اصلی:",
+        reply_markup=back_keyboard(),
+    )
+    return
 
     if data.startswith("duration_"):
         duration = data.replace("duration_", "")
