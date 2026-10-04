@@ -409,7 +409,16 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
+    text = update.message.text
 
+    if text == "🔙 بازگشت":
+        context.user_data.clear()
+
+        await update.message.reply_text(
+            "🏠 به منوی اصلی برگشتید.",
+            reply_markup=main_menu(),
+        )
+        return
     # Admin reply with photo -> send photo + caption to customer
     if ADMIN_ID and user and user.id == ADMIN_ID and update.message.reply_to_message:
         target_user_id = find_support_user(
