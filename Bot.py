@@ -178,7 +178,6 @@ def duration_menu():
         [
             [InlineKeyboardButton("🗓️ یک ماهه", callback_data="duration_1m")],
             [InlineKeyboardButton("🗓️ سه ماهه", callback_data="duration_3m")],
-            [InlineKeyboardButton("🔙 بازگشت", callback_data="back_main")],
         ]
     )
 
@@ -232,8 +231,7 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     data = query.data
-
-    if data == "buy":
+if data == "buy":
     context.user_data.clear()
     await query.edit_message_text(
         "🛒 خرید VPN\n\nمدت سرویس را انتخاب کنید:",
@@ -246,7 +244,6 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=back_keyboard(),
     )
     return
-
     if data.startswith("duration_"):
         duration = data.replace("duration_", "")
         context.user_data["duration"] = duration
@@ -423,16 +420,6 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-    text = update.message.text
-
-    if text == "🔙 بازگشت":
-        context.user_data.clear()
-
-        await update.message.reply_text(
-            "🏠 به منوی اصلی برگشتید.",
-            reply_markup=back_keyboard(),
-        )
-        return
     # Admin reply with photo -> send photo + caption to customer
     if ADMIN_ID and user and user.id == ADMIN_ID and update.message.reply_to_message:
         target_user_id = find_support_user(
