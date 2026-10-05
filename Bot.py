@@ -352,6 +352,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=main_menu(),
         )
         return
+
     # Admin reply routing: reply directly to a support message in the admin chat.
     if ADMIN_ID and user and user.id == ADMIN_ID and update.message.reply_to_message:
         target_user_id = find_support_user(update.message.reply_to_message.message_id)
@@ -375,8 +376,26 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         context.user_data["vpn_username"] = text
+
+        # ارسال مشخصات سفارش برای ادمین بلافاصله بعد از ثبت نام VPN
+        if ADMIN_ID:
+            await context.bot.send_message(
+                chat_id=ADMIN_ID,
+                text=(
+                    "🛒 سفارش جدید\n\n"
+                    f"👤 نام مشتری: {user.full_name}\n"
+                    f"🔗 یوزرنیم تلگرام: @{user.username if user.username else 'ندارد'}\n"
+                    f"🆔 ID: {user.id}\n\n"
+                    f"👤 نام کاربری VPN: {text}\n"
+                    f"🗓️ مدت: {PLANS[context.user_data['duration']]['title']}\n"
+                    f"📦 حجم: {context.user_data['volume']}\n"
+                    f"💰 مبلغ: {context.user_data['price']:,} تومان"
+                ),
+            )
+
         context.user_data["state"] = "confirming"
         duration = context.user_data["duration"]
+
         await update.message.reply_text(
             "🧾 تأیید سفارش\n\n"
             f"👤 نام کاربری VPN: `{text}`\n"
@@ -405,15 +424,18 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"💬 پیام:\n{text}\n\n"
             "↩️ برای پاسخ، همین پیام را Reply کنید."
         )
+
         admin_msg = await context.bot.send_message(
             chat_id=ADMIN_ID,
             text=msg,
         )
+
         save_support_mapping(
             user.id,
             admin_msg.message_id,
             update.message.message_id,
         )
+
         await update.message.reply_text(
             "✅ پیام شما برای پشتیبانی ارسال شد.\n"
             "پاسخ را همینجا دریافت می‌کنید."
@@ -424,7 +446,6 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "لطفاً از منوی اصلی یکی از گزینه‌ها را انتخاب کنید.",
         reply_markup=main_menu(),
     )
-
 
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
